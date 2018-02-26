@@ -70,6 +70,19 @@ def _urlencode(seq, enc):
 
 def _get_form(response, formname, formid, formnumber, formxpath):
     """ Only tested from the form_request method, an be found above """
+    """
+    Requirements
+    If no Form tag exists in the given response body, the program should error out.
+    If there exists a formname that matches the input formname then that form shall be returned.
+    If the formname does not exist the program shall continue.
+    If there exists a formID that matches the input formname then that form shall be returned.
+    If the formID does not exist the program shall continue.
+    User-defined XML can be applyed to find a form and returned to the user.
+    PARTLY UNTESTED - If user XML is faulty and no forms are found, throw an error.
+    The user can specify which form in the list of found forms to be returned.
+    If the formnumber is not specified and no forms found, return None.
+    If the form number does not corespod to an indes of found forms, throw error.
+    """
     """Find the form element """
     covFile = open("/home/koski/Desktop/scrapy/coverage/http_request_form__get_form.txt", "a")
 
@@ -79,6 +92,8 @@ def _get_form(response, formname, formid, formnumber, formxpath):
     if not forms:
         covFile.write("0001\n")
         raise ValueError("No <form> element found in %s" % response)
+    else:
+        covFile.write("0019\n")
 
     if formname is not None:
         covFile.write("0002\n")
@@ -87,6 +102,8 @@ def _get_form(response, formname, formid, formnumber, formxpath):
             covFile.write("0003\n")
             return f[0]
         covFile.write("0004\n")
+    else:
+        covFile.write("0020\n")
 
     if formid is not None:
         covFile.write("0005\n")
@@ -94,6 +111,8 @@ def _get_form(response, formname, formid, formnumber, formxpath):
         if f:
             covFile.write("0006\n")
             return f[0]
+    else:
+        covFile.write("0021\n")
 
     # Get form element from xpath, if not found, go up
     if formxpath is not None:
@@ -108,13 +127,18 @@ def _get_form(response, formname, formid, formnumber, formxpath):
                     return el
                 el = el.getparent()
                 if el is None:
-                    covFile.write("0010\n")
+                    covFile.write("0010\n") ## THIS IS NEVER REACHED
                     break
                 covFile.write("0011\n")
-            covFile.write("0012\n")
+            covFile.write("0012\n")  ## THIS IS NEVER REACHED BECAUSE OF NO. 10
+        else:
+            covFile.write("0022\n")
         covFile.write("0013\n")
         encoded = formxpath if six.PY3 else formxpath.encode('unicode_escape')
         raise ValueError('No <form> element found with %s' % encoded)
+    else:
+        covFile.write("0013\n")
+
     covFile.write("0014\n")
     # If we get here, it means that either formname was None
     # or invalid
@@ -129,16 +153,22 @@ def _get_form(response, formname, formid, formnumber, formxpath):
         else:
             covFile.write("0017\n")
             return form
+    else:
+        covFile.write("0018\n")
 
 
 def _get_inputs(form, formdata, dont_click, clickdata, response):
+    """
+    Requirements
+
+    """
     covFile = open("/home/koski/Desktop/scrapy/coverage/http_request_form__get_inputs.txt", "a")
 
     try:
         formdata = dict(formdata or ())
         covFile.write("0001\n")
     except (ValueError, TypeError):
-        covFile.write("0002\n")
+        covFile.write("0002\n") ## THIS IS NEVER REACHED
         raise ValueError('formdata should be a dict or iterable of tuples')
 
     inputs = form.xpath('descendant::textarea'
@@ -159,6 +189,11 @@ def _get_inputs(form, formdata, dont_click, clickdata, response):
         if clickable and clickable[0] not in formdata and not clickable[0] is None:
             covFile.write("0004\n")
             values.append(clickable)
+        else:
+            covFile.write("0006\n")
+    else:
+        covFile.write("0007\n")
+
     covFile.write("0005\n")
     values.extend((k, v) for k, v in formdata.items() if v is not None)
     return values
@@ -194,6 +229,14 @@ def _get_clickable(clickdata, form):
     Returns the clickable element specified in clickdata,
     if the latter is given. If not, it returns the first
     clickable element found
+
+    Requirements:
+    If a clickable element (a submit btn or a regular btn) does not exist the function should return None.
+    If no data on which clickable event the user wants, the first found clickable event shall be returned.
+    If a number is specified, the clickable with that ID shall be returned-
+    Otherwise if the number of clickable elements is one, then that clickable shall be returned.
+    If there are ambiguity in which one to shoose, the prgram should error out.
+    If there are no elements the program should error out.
     """
     clickables = [
         el for el in form.xpath(
@@ -226,7 +269,8 @@ def _get_clickable(clickdata, form):
         else:
             covFile.write("0005\n")
             return (el.get('name'), el.get('value') or '')
-
+    else:
+        covFile.write("0009\n")
     # We didn't find it, so now we build an XPath expression out of the other
     # arguments, because they can be used as such
     xpath = u'.//*' + \
