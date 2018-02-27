@@ -338,6 +338,15 @@ class SitemapSpiderTest(SpiderTest):
         url = next(spider._parse_sitemap(r),None)
         self.assertIsNone(url)
 
+    def test_sitemap_index(self):
+        sitemap = b"""
+                <?xml version="1.0" encoding="UTF-8"?>
+                <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></sitemapindex>"""
+        r = TextResponse(url="http://www.example.com/sitemap.xml", body=sitemap)
+        spider = self.spider_class("example.com")
+        result = next(spider._parse_sitemap(r),None)
+        self.assertIsNone(result)
+
     def test_get_sitemap_urls_from_robotstxt(self):
         robots = b"""# Sitemap files
 Sitemap: http://example.com/sitemap.xml
