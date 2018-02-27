@@ -10,7 +10,7 @@ if six.PY3:
     from urllib.parse import unquote_to_bytes
 
 from scrapy.http import Request, FormRequest, XmlRpcRequest, Headers, HtmlResponse
-from scrapy.http.request.form import _get_form
+from scrapy.http.request.form import _get_form, _get_inputs
 from scrapy.utils.python import to_bytes, to_native_str
 
 class RequestTest(unittest.TestCase):
@@ -47,7 +47,9 @@ class RequestTest(unittest.TestCase):
         self.assertEqual(r.headers[b"caca"], b"coco")
 
     def test_private_get_inputs(self):
-        pass
+        # Cant convert a string to a dictionary with value parameters raises an error
+        self.assertRaises(ValueError, _get_inputs, None, "None", None, None, None)
+
 
     def test_private_get_form(self):
         response = _buildresponse(

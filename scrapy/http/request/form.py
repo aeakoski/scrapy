@@ -69,14 +69,6 @@ def _urlencode(seq, enc):
 
 
 def _get_form(response, formname, formid, formnumber, formxpath):
-    """
-    Find the form element
-    Response = regular form
-    formname = None
-    Formid = None
-    formxpath = Valid
-    """
-
     root = create_root_node(response.text, lxml.html.HTMLParser,
                             base_url=get_base_url(response))
     forms = root.xpath('//form')
@@ -111,7 +103,6 @@ def _get_form(response, formname, formid, formnumber, formxpath):
 
     # If we get here, it means that either formname was None
     # or invalid
-    print(formnumber)
     if formnumber is not None:
         try:
             form = forms[formnumber]
@@ -120,8 +111,6 @@ def _get_form(response, formname, formid, formnumber, formxpath):
                              (formnumber, response))
         else:
             return form
-    else:
-        print("Hello mfs!!!!")
 
 def _get_inputs(form, formdata, dont_click, clickdata, response):
     try:
