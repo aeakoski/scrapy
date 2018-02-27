@@ -1,0 +1,12 @@
+1: else include_empty is None:
+1: if include_empty is None:
+2.1: else include_empty and not isinstance(item, dict):
+2.1: if include_empty and not isinstance(item, dict):
+2.2: else include_empty:
+2.2: if include_empty:
+2: else self.fields_to_export is None:
+2: if self.fields_to_export is None:
+3: if field_name in item:
+
+missing:
+3: else field_name in item:

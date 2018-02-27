@@ -59,36 +59,61 @@ class BaseItemExporter(object):
         """Return the fields to export as an iterable of tuples
         (name, serialized_value)
         """
+
+        function_name = "_get_serialized_fields"
+        path = __file__.split('.')[0].split('/')
+
+        # Log path, go through filepath until scrapy is reached
+        log_path = []
+        for p in path:
+            log_path.append(p)
+            if p == 'scrapy':
+                break
+
+        log_path = '/'.join(log_path)
+
+        # Log filename, go through reverse filepath until scrapy is reached
+        log_name = [function_name]
+        for p in reversed(path):
+            if p == 'scrapy':
+                break
+            else:
+                log_name.append(p)
+
+        log_name = '_'.join([p for p in reversed(log_name)])
+
+        f = open(log_path + '/logs/' + log_name, 'a')
+
         if include_empty is None:
-            f.write("0001\n")
+            f.write("1: if include_empty is None:\n")
             include_empty = self.export_empty_fields
         else:
-            f.write("0002\n")
+            f.write("1: else include_empty is None:\n")
         if self.fields_to_export is None:
-            f.write("0003\n")
+            f.write("2: if self.fields_to_export is None:\n")
             if include_empty and not isinstance(item, dict):
-                f.write("0004\n")
+                f.write("2.1: if include_empty and not isinstance(item, dict):\n")
                 field_iter = six.iterkeys(item.fields)
             else:
-                f.write("0005\n")
+                f.write("2.1: else include_empty and not isinstance(item, dict):\n")
                 field_iter = six.iterkeys(item)
         else:
-            f.write("0006\n")
+            f.write("2: else self.fields_to_export is None:\n")
             if include_empty:
-                f.write("0007\n")
+                f.write("2.2: if include_empty:\n")
                 field_iter = self.fields_to_export
             else:
-                f.write("0008\n")
+                f.write("2.2: else include_empty:\n")
                 field_iter = (x for x in self.fields_to_export if x in item)
 
         for field_name in field_iter:
             f.write("0009\n")
             if field_name in item:
-                f.write("0010\n")
+                f.write("3: if field_name in item:\n")
                 field = {} if isinstance(item, dict) else item.fields[field_name]
                 value = self.serialize_field(field, field_name, item[field_name])
             else:
-                f.write("0011\n")
+                f.write("3: else field_name in item:\n")
                 value = default_value
 
             yield field_name, value
