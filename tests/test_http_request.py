@@ -915,13 +915,18 @@ class FormRequestTest(RequestTest):
 
     def test_from_response_xpath(self):
         response = _buildresponse(
-            """<form action="post.php" method="POST">
+            """
+            <div>
+            Toodeloo
+            </div>
+            <form action="post.php" method="POST">
             <input type="hidden" name="one" value="1">
             <input type="hidden" name="two" value="2">
             </form>
             <form action="post2.php" method="POST">
             <input type="hidden" name="three" value="3">
             <input type="hidden" name="four" value="4">
+
             </form>""")
         r1 = self.request_class.from_response(response, formxpath="//form[@action='post.php']")
         fs = _qs(r1)
@@ -930,6 +935,9 @@ class FormRequestTest(RequestTest):
         r1 = self.request_class.from_response(response, formxpath="//form/input[@name='four']")
         fs = _qs(r1)
         self.assertEqual(fs[b'three'], [b'3'])
+
+        self.assertRaises(ValueError, self.request_class.from_response,
+                          response, formxpath="//div")
 
         self.assertRaises(ValueError, self.request_class.from_response,
                           response, formxpath="//form/input[@name='abc']")
