@@ -246,44 +246,48 @@ def _get_clickable(clickdata, form):
             '|descendant::button[not(@type)]',
             namespaces={"re": "http://exslt.org/regular-expressions"})
         ]
+    covFile.write("\n\nSTART --- PATH\n")
+    covFile.write("0001\n")
     if not clickables:
-        covFile.write("0001\n")
+        covFile.write("0002\n")
         return
-
+    covFile.write("0003\n")
     # If we don't have clickdata, we just use the first clickable element
     if clickdata is None:
-        covFile.write("0002\n")
+        covFile.write("0004\n")
         el = clickables[0]
         return (el.get('name'), el.get('value') or '')
-
+    covFile.write("0005\n")
     # If clickdata is given, we compare it to the clickable elements to find a
     # match. We first look to see if the number is specified in clickdata,
     # because that uniquely identifies the element
     nr = clickdata.get('nr', None)
+
     if nr is not None:
-        covFile.write("0003\n")
+        covFile.write("0006\n")
         try:
             el = list(form.inputs)[nr]
         except IndexError:
-            covFile.write("0004\n")
+            covFile.write("0007\n")
             pass
         else:
-            covFile.write("0005\n")
+            covFile.write("0008\n")
             return (el.get('name'), el.get('value') or '')
     else:
         covFile.write("0009\n")
     # We didn't find it, so now we build an XPath expression out of the other
     # arguments, because they can be used as such
+    covFile.write("0010\n")
     xpath = u'.//*' + \
             u''.join(u'[@%s="%s"]' % c for c in six.iteritems(clickdata))
     el = form.xpath(xpath)
     if len(el) == 1:
-        covFile.write("0006\n")
+        covFile.write("0011\n")
         return (el[0].get('name'), el[0].get('value') or '')
     elif len(el) > 1:
-        covFile.write("0007\n")
+        covFile.write("0012\n")
         raise ValueError("Multiple elements found (%r) matching the criteria "
                          "in clickdata: %r" % (el, clickdata))
     else:
-        covFile.write("0008\n")
+        covFile.write("0013\n")
         raise ValueError('No clickable element matching clickdata: %r' % (clickdata,))
