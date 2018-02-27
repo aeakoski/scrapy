@@ -83,6 +83,11 @@ class BaseItemExporterTest(unittest.TestCase):
         assert isinstance(name, six.text_type)
         self.assertEqual(name, u'John\xa3')
 
+    def test_default_value(self):
+        # Test that the default value gets assigned to field
+        ie = self._get_exporter(fields_to_export=['name', 'height'])
+        self.assertEqual(list(ie._get_serialized_fields(self.i, default_value='180cm', include_empty=True)), [('name', u'John\xa3'), ('height', '180cm')])
+
     def test_field_custom_serializer(self):
         def custom_serializer(value):
             return str(int(value) + 2)
