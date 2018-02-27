@@ -82,17 +82,17 @@ def _get_form(response, formname, formid, formnumber, formxpath):
     forms = root.xpath('//form')
     if not forms:
         raise ValueError("No <form> element found in %s" % response)
-
+    print(formname)
     if formname is not None:
         f = root.xpath('//form[@name="%s"]' % formname)
         if f:
             return f[0]
-
+    print(formid)
     if formid is not None:
         f = root.xpath('//form[@id="%s"]' % formid)
         if f:
             return f[0]
-
+    print(formxpath)
     # Get form element from xpath, if not found, go up
     if formxpath is not None:
         nodes = root.xpath(formxpath)
@@ -111,6 +111,7 @@ def _get_form(response, formname, formid, formnumber, formxpath):
 
     # If we get here, it means that either formname was None
     # or invalid
+    print(formnumber)
     if formnumber is not None:
         try:
             form = forms[formnumber]
@@ -119,7 +120,8 @@ def _get_form(response, formname, formid, formnumber, formxpath):
                              (formnumber, response))
         else:
             return form
-
+    else:
+        print("Hello mfs!!!!")
 
 def _get_inputs(form, formdata, dont_click, clickdata, response):
     try:

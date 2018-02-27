@@ -339,6 +339,8 @@ class FormRequestTest(RequestTest):
         self.assertEqual(fs[b'test2'], [b'xxx'])
         self.assertEqual(fs[b'six'], [b'seven'])
 
+
+
     def test_from_response_post_nonascii_bytes_utf8(self):
         response = _buildresponse(
             b"""<form action="post.php" method="POST">
@@ -941,6 +943,10 @@ class FormRequestTest(RequestTest):
 
         self.assertRaises(ValueError, self.request_class.from_response,
                           response, formxpath="//form/input[@name='abc']")
+
+        r2 = self.request_class.from_response(response, None, None, None, None, None, False, None, None)
+        fs2 = _qs(r2)
+        self.assertEqual(fs2, None)
 
     def test_from_response_unicode_xpath(self):
         response = _buildresponse(b'<form name="\xd1\x8a"></form>')
