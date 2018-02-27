@@ -331,6 +331,12 @@ class SitemapSpiderTest(SpiderTest):
         # .xml.gz but body decoded by HttpCompression middleware already
         r = Response(url="http://www.example.com/sitemap.xml.gz", body=self.BODY)
         self.assertSitemapBody(r, self.BODY)
+    
+    def test_no_robot_no_body(self):
+        spider = self.spider_class("example.com")
+        r = Response(url="http://www.example.com/site", body=None)
+        url = next(spider._parse_sitemap(r),None)
+        self.assertIsNone(url)
 
     def test_get_sitemap_urls_from_robotstxt(self):
         robots = b"""# Sitemap files
