@@ -69,23 +69,19 @@ def _urlencode(seq, enc):
 
 
 def _get_form(response, formname, formid, formnumber, formxpath):
-    """Find the form element """
     root = create_root_node(response.text, lxml.html.HTMLParser,
                             base_url=get_base_url(response))
     forms = root.xpath('//form')
     if not forms:
         raise ValueError("No <form> element found in %s" % response)
-
     if formname is not None:
         f = root.xpath('//form[@name="%s"]' % formname)
         if f:
             return f[0]
-
     if formid is not None:
         f = root.xpath('//form[@id="%s"]' % formid)
         if f:
             return f[0]
-
     # Get form element from xpath, if not found, go up
     if formxpath is not None:
         nodes = root.xpath(formxpath)
@@ -97,6 +93,7 @@ def _get_form(response, formname, formid, formnumber, formxpath):
                 el = el.getparent()
                 if el is None:
                     break
+            ## Go here
         encoded = formxpath if six.PY3 else formxpath.encode('unicode_escape')
         raise ValueError('No <form> element found with %s' % encoded)
 
@@ -110,7 +107,6 @@ def _get_form(response, formname, formid, formnumber, formxpath):
                              (formnumber, response))
         else:
             return form
-
 
 def _get_inputs(form, formdata, dont_click, clickdata, response):
     try:
