@@ -103,9 +103,8 @@ def _get_form(response, formname, formid, formnumber, formxpath):
                 if el.tag == 'form':
                     return el
                 el = el.getparent()
-                if el is None:                    
+                if el is None:
                     break
-                    ## Go here
             ## Go here
         encoded = formxpath if six.PY3 else formxpath.encode('unicode_escape')
         raise ValueError('No <form> element found with %s' % encoded)
