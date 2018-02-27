@@ -87,6 +87,25 @@ def _get_form(response, formname, formid, formnumber, formxpath):
             return f[0]
 
     # Get form element from xpath, if not found, go up
+    el = formFromXPath(root,formxpath)
+    if el:
+        return el
+    # If we get here, it means that either formname was None
+    # or invalid
+    return validateFormnumber(formnumber,forms,response)
+
+def validateFormnumber(formnumber,forms,response):
+    if formnumber is not None:
+        try:
+            form = forms[formnumber]
+        except IndexError:
+            raise IndexError("Form number %d not found in %s" %
+                             (formnumber, response))
+        else:
+            return form
+
+
+def formFromXPath(root,formxpath):
     if formxpath is not None:
         nodes = root.xpath(formxpath)
         if nodes:
@@ -99,17 +118,6 @@ def _get_form(response, formname, formid, formnumber, formxpath):
                     break
         encoded = formxpath if six.PY3 else formxpath.encode('unicode_escape')
         raise ValueError('No <form> element found with %s' % encoded)
-
-    # If we get here, it means that either formname was None
-    # or invalid
-    if formnumber is not None:
-        try:
-            form = forms[formnumber]
-        except IndexError:
-            raise IndexError("Form number %d not found in %s" %
-                             (formnumber, response))
-        else:
-            return form
 
 
 def _get_inputs(form, formdata, dont_click, clickdata, response):
