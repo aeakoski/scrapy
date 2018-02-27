@@ -32,25 +32,38 @@ class SitemapSpider(Spider):
             yield Request(url, self._parse_sitemap)
 
     def _parse_sitemap(self, response):
+        log = open("/Users/david/Developer/school/se18/scrapy-fork/_parse_sitemap.cov","a")
+
         if response.url.endswith('/robots.txt'):
+            log.write("001 if robots\n")
             for url in sitemap_urls_from_robots(response.text, base_url=response.url):
+                log.write("002 for loop\n")
                 yield Request(url, callback=self._parse_sitemap)
         else:
+            log.write("003 else robots \n")
             body = self._get_sitemap_body(response)
             if body is None:
+                log.write("004 body is none \n")
                 logger.warning("Ignoring invalid sitemap: %(response)s",
                                {'response': response}, extra={'spider': self})
                 return
 
             s = Sitemap(body)
             if s.type == 'sitemapindex':
+                log.write("005 s.type == sitemapindex \n")
                 for loc in iterloc(s, self.sitemap_alternate_links):
+                    log.write("006 for loop of alternative links\n")
                     if any(x.search(loc) for x in self._follow):
+                        log.write("007 if any x search\n")
                         yield Request(loc, callback=self._parse_sitemap)
             elif s.type == 'urlset':
+                log.write("008 else s.type == urlset\n")
                 for loc in iterloc(s, self.sitemap_alternate_links):
+                    log.write("009 for loop loc iterloc \n")
                     for r, c in self._cbs:
+                        log.write("010 for loop self_.cbs\n")
                         if r.search(loc):
+                            log.write("011 if r.search\n")
                             yield Request(loc, callback=c)
                             break
 

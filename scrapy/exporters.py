@@ -54,6 +54,8 @@ class BaseItemExporter(object):
         pass
 
     def _get_serialized_fields(self, item, default_value=None, include_empty=None):
+        f = open("/tmp/_get_serialized_fields","a")
+        f.write("0000\n")
         """Return the fields to export as an iterable of tuples
         (name, serialized_value)
         """
@@ -105,6 +107,7 @@ class BaseItemExporter(object):
                 field_iter = (x for x in self.fields_to_export if x in item)
 
         for field_name in field_iter:
+            f.write("0009\n")
             if field_name in item:
                 f.write("3: if field_name in item:\n")
                 field = {} if isinstance(item, dict) else item.fields[field_name]
@@ -114,6 +117,7 @@ class BaseItemExporter(object):
                 value = default_value
 
             yield field_name, value
+
 
 
 class JsonLinesItemExporter(BaseItemExporter):
