@@ -1,0 +1,11 @@
+001 if robots
+002 for loop
+003 else robots
+008 else s.type == urlset
+009 for loop loc iterloc
+010 for loop self_.cbs
+011 if r.search
+
+total 11
+tests cover 7 branches.
+7/11 = 63.36 % coverage
