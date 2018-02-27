@@ -10,8 +10,8 @@ if six.PY3:
     from urllib.parse import unquote_to_bytes
 
 from scrapy.http import Request, FormRequest, XmlRpcRequest, Headers, HtmlResponse
+from scrapy.http.request.form import _get_form
 from scrapy.utils.python import to_bytes, to_native_str
-
 
 class RequestTest(unittest.TestCase):
 
@@ -45,6 +45,33 @@ class RequestTest(unittest.TestCase):
         self.assertEqual(r.meta, meta)
         assert r.headers is not headers
         self.assertEqual(r.headers[b"caca"], b"coco")
+
+    def test_private_get_inputs(self):
+        pass
+
+    def test_private_get_form(self):
+        response = _buildresponse(
+            """
+            <div>
+            Toodeloo
+            </div>
+            <form action="post.php" method="POST">
+            <input type="hidden" name="one" value="1">
+            <input type="hidden" name="two" value="2">
+            </form>
+            <form action="post2.php" method="POST">
+            <input type="hidden" name="three" value="3">
+            <input type="hidden" name="four" value="4">
+
+            </form>
+            """)
+        # Raises an error if the xpath does not point to a form
+        self.assertRaises(ValueError, _get_form,
+                          response, None, None, None, formxpath="//div")
+
+        # Returns None if all parameters are passed in as None
+        self.assertEqual(_get_form(response, None, None, None, None), None)
+
 
     def test_url_no_scheme(self):
         self.assertRaises(ValueError, self.request_class, 'foo')
@@ -493,6 +520,7 @@ class FormRequestTest(RequestTest):
         self.assertFalse(b'i1' in fs, fs)  # xpath in _get_inputs()
         self.assertFalse(b'clickable2' in fs, fs)  # xpath in _get_clickable()
 
+
     def test_from_response_submit_first_clickable(self):
         response = _buildresponse(
             """<form action="get.php" method="GET">
@@ -915,12 +943,10 @@ class FormRequestTest(RequestTest):
         fs = _qs(req)
         self.assertEqual(set(fs), set([b'h2', b'i2', b'i1', b'i3', b'h1', b'i5', b'i4']))
 
+
     def test_from_response_xpath(self):
         response = _buildresponse(
             """
-            <div>
-            Toodeloo
-            </div>
             <form action="post.php" method="POST">
             <input type="hidden" name="one" value="1">
             <input type="hidden" name="two" value="2">
@@ -938,15 +964,10 @@ class FormRequestTest(RequestTest):
         fs = _qs(r1)
         self.assertEqual(fs[b'three'], [b'3'])
 
-        self.assertRaises(ValueError, self.request_class.from_response,
-                          response, formxpath="//div")
 
         self.assertRaises(ValueError, self.request_class.from_response,
                           response, formxpath="//form/input[@name='abc']")
 
-        r2 = self.request_class.from_response(response, None, None, None, None, None, False, None, None)
-        fs2 = _qs(r2)
-        self.assertEqual(fs2, None)
 
     def test_from_response_unicode_xpath(self):
         response = _buildresponse(b'<form name="\xd1\x8a"></form>')
