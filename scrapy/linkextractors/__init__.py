@@ -71,30 +71,18 @@ class FilteringLinkExtractor(object):
         self.deny_extensions = {'.' + e for e in arg_to_iter(deny_extensions)}
 
     def _link_allowed(self, link):
-# Save original working directory
-        owd = "/Users/david/Developer/school/se18/scrapy-fork/" 
-        function_name = '_link_allowed.cov' # <-- Function name here!
-        filename = owd + function_name
-# This is the file to write to
-        log = open(filename, "a")
         if not _is_valid_url(link.url):
-            log.write("1 not _is_valdi_url branch\n")
             return False
         if self.allow_res and not _matches(link.url, self.allow_res):
-            log.write("2 allow res and not matches link\n")
             return False
         if self.deny_res and _matches(link.url, self.deny_res):
-            log.write("3 deny res and matches link\n")
             return False
         parsed_url = urlparse(link.url)
         if self.allow_domains and not url_is_from_any_domain(parsed_url, self.allow_domains):
-            log.write("4 allow domains ad not url_is_from_any_domain\n")
             return False
         if self.deny_domains and url_is_from_any_domain(parsed_url, self.deny_domains):
-            log.write("5 deny domains and url_is_from_any_domain\n")
             return False
         if self.deny_extensions and url_has_any_extension(parsed_url, self.deny_extensions):
-            log.write("6 deny extensions and url_has_any_extension\n")
             return False
         return True
 
