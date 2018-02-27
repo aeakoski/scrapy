@@ -161,51 +161,78 @@ class Command(ScrapyCommand):
 
     def prepare_request(self, spider, request, opts):
         def callback(response):
+            f = open("/tmp/prepare_request_callback", "a")
+
+            f.write("0000\n")
             # memorize first request
             if not self.first_response:
+                f.write("0001\n")
                 self.first_response = response
+            else:
+                f.write("0002\n") #added else
 
             # determine real callback
             cb = response.meta['_callback']
             if not cb:
+                f.write("0003\n")
                 if opts.callback:
+                    f.write("0004\n")
                     cb = opts.callback
                 elif opts.rules and self.first_response == response:
+                    f.write("0005\n")
                     cb = self.get_callback_from_rules(spider, response)
 
                     if not cb:
+                        f.write("0006\n")
                         logger.error('Cannot find a rule that matches %(url)r in spider: %(spider)s',
                                  {'url': response.url, 'spider': spider.name})
                         return
                 else:
+                    f.write("0007\n")
                     cb = 'parse'
+            else:
+                f.write("0008\n") #added else
 
             if not callable(cb):
+                f.write("0009\n")
                 cb_method = getattr(spider, cb, None)
                 if callable(cb_method):
+                    f.write("0010\n")
                     cb = cb_method
                 else:
+                    f.write("0011\n")
                     logger.error('Cannot find callback %(callback)r in spider: %(spider)s',
                                  {'callback': cb, 'spider': spider.name})
                     return
+            else:
+                f.write("0012\n") #added else
 
             # parse items and requests
             depth = response.meta['_depth']
 
             items, requests = self.run_callback(response, cb)
             if opts.pipelines:
+                f.write("0013\n")
                 itemproc = self.pcrawler.engine.scraper.itemproc
                 for item in items:
+                    f.write("0014\n")
                     itemproc.process_item(item, spider)
+            else:
+                f.write("0015\n") #added else
+
             self.add_items(depth, items)
             self.add_requests(depth, requests)
 
             if depth < opts.depth:
+                f.write("0016\n")
                 for req in requests:
+                    f.write("0017\n")
                     req.meta['_depth'] = depth + 1
                     req.meta['_callback'] = req.callback
                     req.callback = callback
                 return requests
+            else:
+                f.write("0018\n") #added else
 
         #update request meta if any extra meta was passed through the --meta/-m opts.
         if opts.meta:

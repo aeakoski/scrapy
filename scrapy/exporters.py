@@ -54,30 +54,45 @@ class BaseItemExporter(object):
         pass
 
     def _get_serialized_fields(self, item, default_value=None, include_empty=None):
+        f = open("/tmp/_get_serialized_fields","a")
+        f.write("0000\n")
         """Return the fields to export as an iterable of tuples
         (name, serialized_value)
         """
         if include_empty is None:
+            f.write("0001\n")
             include_empty = self.export_empty_fields
+        else:
+            f.write("0002\n")
         if self.fields_to_export is None:
+            f.write("0003\n")
             if include_empty and not isinstance(item, dict):
+                f.write("0004\n")
                 field_iter = six.iterkeys(item.fields)
             else:
+                f.write("0005\n")
                 field_iter = six.iterkeys(item)
         else:
+            f.write("0006\n")
             if include_empty:
+                f.write("0007\n")
                 field_iter = self.fields_to_export
             else:
+                f.write("0008\n")
                 field_iter = (x for x in self.fields_to_export if x in item)
 
         for field_name in field_iter:
+            f.write("0009\n")
             if field_name in item:
+                f.write("0010\n")
                 field = {} if isinstance(item, dict) else item.fields[field_name]
                 value = self.serialize_field(field, field_name, item[field_name])
             else:
+                f.write("0011\n")
                 value = default_value
 
             yield field_name, value
+
 
 
 class JsonLinesItemExporter(BaseItemExporter):
