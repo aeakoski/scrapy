@@ -208,25 +208,25 @@ class Command(ScrapyCommand):
             if opts.pipelines:
                 f.write("0010\n")
                 itemproc = self.pcrawler.engine.scraper.itemproc
-                b1 = false
+                b1 = False
                 for item in items:
-                    b1 = true
+                    if(not b1):
+                        f.write("0011\n")
+                        b1 = True
                     itemproc.process_item(item, spider)
-                if(b1):
-                    f.write("0011\n")
             self.add_items(depth, items)
             self.add_requests(depth, requests)
 
             if depth < opts.depth:
                 f.write("0012\n")
-                b1 = false
+                b1 = False
                 for req in requests:
-                    b1 = true
+                    if(not b1):
+                        f.write("0013\n")
+                        b1 = True
                     req.meta['_depth'] = depth + 1
                     req.meta['_callback'] = req.callback
                     req.callback = callback
-                if(b1):
-                    f.write("0013\n")
                 return requests
             f.write("0013\n")
 
