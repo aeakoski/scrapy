@@ -333,12 +333,14 @@ class SitemapSpiderTest(SpiderTest):
         self.assertSitemapBody(r, self.BODY)
     
     def test_no_robot_no_body(self):
+        #contract/requirment: the parse_sitemap should return None if the request body is None
         spider = self.spider_class("example.com")
         r = Response(url="http://www.example.com/site", body=None)
         url = next(spider._parse_sitemap(r),None)
         self.assertIsNone(url)
 
     def test_sitemap_index(self):
+        #contract/requirment: A sitemapindex with no locs should return None
         sitemap = b"""
                 <?xml version="1.0" encoding="UTF-8"?>
                 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></sitemapindex>"""
