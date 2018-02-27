@@ -23,6 +23,20 @@ class ItemTest(unittest.TestCase):
         i['name'] = u'name'
         self.assertEqual(i['name'], u'name')
 
+    def test_delete_item(self):
+        #contract: If you remove the item the list should be one size smaller 
+        #and the object no longer accessible
+        class TestItem(Item):
+            pass
+        i = TestItem()
+        i.fields['a'] = 'a'
+        i.__setitem__('a','2')
+        self.assertEqual(1,i.__len__())
+        i.__delitem__('a')
+        self.assertEqual(0,i.__len__())
+        self.assertRaises(KeyError, i.__getitem__, 'a')
+
+
     def test_init(self):
         class TestItem(Item):
             name = Field()
