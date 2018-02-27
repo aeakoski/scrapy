@@ -331,6 +331,49 @@ class SitemapSpiderTest(SpiderTest):
         # .xml.gz but body decoded by HttpCompression middleware already
         r = Response(url="http://www.example.com/sitemap.xml.gz", body=self.BODY)
         self.assertSitemapBody(r, self.BODY)
+    
+    def test_no_robot_no_body(self):
+        #contract/requirment: the parse_sitemap should return None if the request body is None
+        spider = self.spider_class("example.com")
+        r = Response(url="http://www.example.com/site", body=None)
+        url = next(spider._parse_sitemap(r),None)
+        self.assertIsNone(url)
+
+    def test_sitemap_index(self):
+        #contract/requirment: A sitemapindex with no locs should return None
+        sitemap = b"""
+                <?xml version="1.0" encoding="UTF-8"?>
+                <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></sitemapindex>"""
+        r = TextResponse(url="http://www.example.com/sitemap.xml", body=sitemap)
+        spider = self.spider_class("example.com")
+        result = next(spider._parse_sitemap(r),None)
+        self.assertIsNone(result)
+
+    def test_sitemap_index_w_locs_no_match(self):
+        #contract/requirement: Sitemapindex with locs where SitemapSpider does not match anything, nothing should be returned 
+        sitemap = b"""
+                <?xml version="1.0" encoding="UTF-8"?>
+                <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+                <sitemap><loc>http://www.example.com/sitemap1.xml.gz</loc><lastmod>2004-10-01T18:23:17+00:00</lastmod>
+                </sitemap>
+                <sitemap><loc>http://www.example.com/sitemap2.xml.gz</loc>
+                <lastmod>2005-01-01</lastmod></sitemap></sitemapindex>"""
+        r = TextResponse(url="http://www.example.com/sitemap.xml", body=sitemap)
+        SitemapSpider.sitemap_follow = []
+        spider = self.spider_class("example.com")
+        self.assertEqual([req.url for req in spider._parse_sitemap(r)],[])
+    def test_sitemap_index_w_locs_match(self):
+        #contract/requirement: Sitemapindex with locs wherw SitemapSpider match everything, all locs found should be returned
+        sitemap = b"""
+                <?xml version="1.0" encoding="UTF-8"?>
+                <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+                <sitemap><loc>http://www.example.com/sitemap1.xml.gz</loc><lastmod>2004-10-01T18:23:17+00:00</lastmod>
+                </sitemap>
+                <sitemap><loc>http://www.example.com/sitemap2.xml.gz</loc>
+                <lastmod>2005-01-01</lastmod></sitemap></sitemapindex>"""
+        r = TextResponse(url="http://www.example.com/sitemap.xml", body=sitemap)
+        spider = self.spider_class("example.com")
+        self.assertEqual([req.url for req in spider._parse_sitemap(r)],["http://www.example.com/sitemap1.xml.gz","http://www.example.com/sitemap2.xml.gz"])
 
     def test_get_sitemap_urls_from_robotstxt(self):
         robots = b"""# Sitemap files
