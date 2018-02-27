@@ -104,6 +104,7 @@ def _get_form(response, formname, formid, formnumber, formxpath):
         covFile.write("0004\n")
     else:
         covFile.write("0020\n")
+        # Testcomment
 
     if formid is not None:
         covFile.write("0005\n")
