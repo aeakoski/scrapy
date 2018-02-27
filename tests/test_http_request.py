@@ -10,7 +10,7 @@ if six.PY3:
     from urllib.parse import unquote_to_bytes
 
 from scrapy.http import Request, FormRequest, XmlRpcRequest, Headers, HtmlResponse
-from scrapy.http.request.form import _get_form, _get_inputs
+from scrapy.http.request.form import _get_form, _get_inputs, _get_clickable
 from scrapy.utils.python import to_bytes, to_native_str
 
 class RequestTest(unittest.TestCase):
@@ -73,6 +73,31 @@ class RequestTest(unittest.TestCase):
 
         # Returns None if all parameters are passed in as None
         self.assertEqual(_get_form(response, None, None, None, None), None)
+
+    def test_path_coverage_get_clickable(self):
+        response1 = _buildresponse("""<form id ="myform" action="post.php" method="POST">
+        <input type="hidden" name="test11" value="val11">
+        <input type="hidden" name="test22" value="val22">
+        <button type="submit" name="button1" nr="5" value="submit1">Submit</button>
+        <button type="submit" name="button2" nr="5" value="submit2">Submit</button>
+        </form>""")
+        form1 = _get_form(response1, None, "myform", None, None)
+        clickdata = {'nr': 5}
+
+
+        response2 = _buildresponse("""<form id ="myform" action="post.php" method="POST">
+        <input type="hidden" name="test11" value="val11">
+        <input type="hidden" name="test22" value="val22">
+        <button type="submit" name="button1" nr="5" value="submit1">Submit</button>
+        </form>""")
+        form2 = _get_form(response2, None, "myform", None, None)
+        clickdata = {'nr': 5}
+
+        # Multiple clickable events found
+        self.assertRaises(ValueError, _get_clickable, clickdata, form1)
+
+        # Got clickable and returned it
+        self.assertEqual(_get_clickable(clickdata, form2), ("button1", "submit1"))
 
 
     def test_url_no_scheme(self):
