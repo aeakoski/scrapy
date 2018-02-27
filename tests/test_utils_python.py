@@ -212,6 +212,11 @@ class UtilsPythonTestCase(unittest.TestCase):
         self.assertEqual(get_func_args(partial_f3), ['c'])
         self.assertEqual(get_func_args(cal), ['a', 'b', 'c'])
         self.assertEqual(get_func_args(object), [])
+        
+        #If the parameter of the function is not callable it should raise
+        #a TypeError error (5 is not callable)
+        self.assertRaises(TypeError, get_func_args, 5)
+
 
         if platform.python_implementation() == 'CPython':
             # TODO: how do we fix this to return the actual argument names?

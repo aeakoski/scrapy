@@ -136,6 +136,15 @@ class BasicItemLoaderTest(unittest.TestCase):
         il.add_value(None, u'Jim', lambda x: {'name': x})
         self.assertEqual(il.get_collected_values('name'), [u'Marta', u'Pepe', u'Jim'])
 
+
+    def test_add_none(self):
+        #If None is added, nothing should change
+        val = None
+        il = NameItemLoader()
+        self.assertEqual('name', il.get_value('name'))
+        il.add_value('name',val)
+        self.assertEqual('name', il.get_value('name'))
+
     def test_add_zero(self):
         il = NameItemLoader()
         il.add_value('name', 0)
@@ -152,6 +161,15 @@ class BasicItemLoaderTest(unittest.TestCase):
 
         il.replace_value(None, u'Jim', lambda x: {'name': x})
         self.assertEqual(il.get_collected_values('name'), [u'Jim'])
+
+    def test_replace_none(self):
+        #If None is replaced, nothing should change
+        val = None
+        il = NameItemLoader()
+        il.add_value('name', u'Marta')
+        self.assertEqual(il.get_collected_values('name'), [u'Marta'])
+        il.replace_value('name',val)
+        self.assertEqual(il.get_collected_values('name'), [u'Marta'])
 
     def test_get_value(self):
         il = NameItemLoader()
