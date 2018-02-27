@@ -72,57 +72,38 @@ class Command(ScrapyCommand):
 
         spider_loader = self.crawler_process.spider_loader
         
-        b1 = False
-        b2 = False
-        b3 = False
-        b4 = False
         for spidername in args or spider_loader.list():
 
-            if(not b1):
-                b1 = True
-                f.write("0001\n")
+            f.write("0001\n")
             spidercls = spider_loader.load(spidername)
             spidercls.start_requests = lambda s: conman.from_spider(s, result)
 
             tested_methods = conman.tested_methods_from_spidercls(spidercls)
             if opts.list:
-                if(not b2):
-                    f.write("0002\n")
-                    b2 = True
+                f.write("0002\n")
                 for method in tested_methods:
-                    if(not b3):
-                        f.write("0003\n")
-                        b3 = True
+                    f.write("0003\n")
                     contract_reqs[spidercls.name].append(method)
             elif tested_methods:
-                if(not b4):
-                    f.write("0004\n")
-                    b4 = True
+                f.write("0004\n")
                 self.crawler_process.crawl(spidercls)
+            else:
+                f.write("0005\n")
 
         # start checks
         if opts.list:
-            f.write("0005\n")
-            b1 = false
-            b2 = false
-            b3 = false
+            f.write("0006\n")
             for spider, methods in sorted(contract_reqs.items()):
-                if(not b1):
-                    f.write("0006\n")
-                    b1 = True
+                f.write("0007\n")
                 if not methods and not opts.verbose:
-                    if(not b2):
-                        f.write("0007\n")
-                        b2 = True
+                    f.write("0008\n")
                     continue
                 print(spider)
                 for method in sorted(methods):
-                    if(not b3):
-                        f.write("0008\n")
-                        b3 = True
+                    f.write("0009\n")
                     print('  * %s' % method)
         else:
-            f.write("0009\n")
+            f.write("0010\n")
             start = time.time()
             self.crawler_process.start()
             stop = time.time()

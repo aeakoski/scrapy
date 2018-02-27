@@ -254,6 +254,8 @@ def get_func_args(func, stripself=False):
         if stripself:
             f.write("0011\n")
             func_args.pop(0)
+        else:
+            f.write("0012\n")
         return func_args
 
 
