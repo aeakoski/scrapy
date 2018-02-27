@@ -72,32 +72,33 @@ class Command(ScrapyCommand):
 
         spider_loader = self.crawler_process.spider_loader
         
-        b1 = false
-        b2 = false
-        b3 = false
-        b4 = false
+        b1 = False
+        b2 = False
+        b3 = False
+        b4 = False
         for spidername in args or spider_loader.list():
-            b1 = true
+
+            if(not b1):
+                b1 = True
+                f.write("0001\n")
             spidercls = spider_loader.load(spidername)
             spidercls.start_requests = lambda s: conman.from_spider(s, result)
 
             tested_methods = conman.tested_methods_from_spidercls(spidercls)
             if opts.list:
-                b2 = true
+                if(not b2):
+                    f.write("0002\n")
+                    b2 = True
                 for method in tested_methods:
-                    b3 = true
+                    if(not b3):
+                        f.write("0003\n")
+                        b3 = True
                     contract_reqs[spidercls.name].append(method)
             elif tested_methods:
-                b4 = true
+                if(not b4):
+                    f.write("0004\n")
+                    b4 = True
                 self.crawler_process.crawl(spidercls)
-        if(b1):
-            f.write("0001\n")
-        if(b2):
-            f.write("0002\n")
-        if(b3):
-            f.write("0003\n")
-        if(b4):
-            f.write("0004\n")
 
         # start checks
         if opts.list:
@@ -106,20 +107,20 @@ class Command(ScrapyCommand):
             b2 = false
             b3 = false
             for spider, methods in sorted(contract_reqs.items()):
-                b1 = true
+                if(not b1):
+                    f.write("0006\n")
+                    b1 = True
                 if not methods and not opts.verbose:
-                    b2 = true
+                    if(not b2):
+                        f.write("0007\n")
+                        b2 = True
                     continue
                 print(spider)
                 for method in sorted(methods):
-                    b3 = true
+                    if(not b3):
+                        f.write("0008\n")
+                        b3 = True
                     print('  * %s' % method)
-            if(b1):
-                f.write("0006\n")
-            if(b2):
-                f.write("0007\n")
-            if(b3):
-                f.write("0008\n")
         else:
             f.write("0009\n")
             start = time.time()
