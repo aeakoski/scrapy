@@ -111,31 +111,49 @@ class ExecutionEngine(object):
         self.paused = False
 
     def _next_request(self, spider):
+        # open log file to write to
+        log_dir = "/Users/oskarek/Documents/Skola/Programutvecklingsteknikens_grunder/lab4/scrapy"
+        log = open(log_dir + "/_next_request.cov", "a")
+
         slot = self.slot
         if not slot:
+            log.write("1 if not slot\n")
             return
 
         if self.paused:
+            log.write("2 if self.paused\n")
             return
 
         while not self._needs_backout(spider):
+            log.write("3 while self._needs_backout(spider)\n")
             if not self._next_request_from_scheduler(spider):
+                log.write("4 if not self._next_request_from_scheduler(spider)\n")
                 break
+            else:
+                log.write("5 else not self._next_request_from_scheduler(spider)\n")
 
         if slot.start_requests and not self._needs_backout(spider):
+            log.write("6 if slot.start_requests and not self._needs_backout(spider)\n")
             try:
                 request = next(slot.start_requests)
+                log.write("7 try no error\n")
             except StopIteration:
+                log.write("8 except StopIteration\n")
                 slot.start_requests = None
             except Exception:
+                log.write("9 except Exception\n")
                 slot.start_requests = None
                 logger.error('Error while obtaining start requests',
                              exc_info=True, extra={'spider': spider})
             else:
+                log.write("10 else slot.start_requests and not self._needs_backout(spider)\n")
                 self.crawl(request, spider)
 
         if self.spider_is_idle(spider) and slot.close_if_idle:
+            log.write("11 if self.spider_is_idle(spider) and not slot.close_if_idle\n")
             self._spider_idle(spider)
+        else:
+            log.write("12 else self.spider_is_idle(spider) and not slot.close_if_idle\n")
 
     def _needs_backout(self, spider):
         slot = self.slot

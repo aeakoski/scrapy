@@ -1,0 +1,15 @@
+1 if not slot
+3 while self._needs_backout(spider)
+4 if not self._next_request_from_scheduler(spider)
+5 else not self._next_request_from_scheduler(spider)
+6 if slot.start_requests and not self._needs_backout(spider)
+7 try no error
+8 except StopIteration
+9 except Exception
+10 else slot.start_requests and not self._needs_backout(spider)
+11 if self.spider_is_idle(spider) and not slot.close_if_idle
+12 else self.spider_is_idle(spider) and not slot.close_if_idle
+
+total 12
+covers 11
+11/12 = 91.667% coverage
