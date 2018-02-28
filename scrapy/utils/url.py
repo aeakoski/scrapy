@@ -106,9 +106,8 @@ def guess_scheme(url):
 
 
 def strip_url(url, strip_credentials=True, strip_default_port=True, origin_only=False, strip_fragment=True):
-
-    """Strip URL string from some of its components:
-
+    """
+    Requirements:
     - `strip_credentials` removes "user:password@"
     - `strip_default_port` removes ":80" (resp. ":443", ":21")
       from http:// (resp. https://, ftp://) URLs
