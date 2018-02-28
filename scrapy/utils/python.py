@@ -217,6 +217,13 @@ def _getargspec_py23(func):
     return inspect.ArgSpec(*inspect.getfullargspec(func)[:4])
 
 
+"""
+- If func is callable, the function should extract and return the
+  argument list for the callable
+- If func is not callable, the function should raise a TypeError
+- If stripself parameter is set to true the returned arglist should
+  be shortened if the function is callable
+"""
 def get_func_args(func, stripself=False):
     """Return the argument name list of a callable"""
     if inspect.isfunction(func):

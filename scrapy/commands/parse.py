@@ -160,6 +160,17 @@ class Command(ScrapyCommand):
                          {'url': url})
 
     def prepare_request(self, spider, request, opts):
+
+        """
+        Requirements:
+        - If the response is not the first response, make it the first response
+        - The real callback should be chosen depending on whether or not certain values exist
+          and if none exist the function should log an error and return
+        - If the chosen callback is not callable the function should try to extract a callable
+          from its attributes and if that is not callable it should log an error and return
+        - After the callback is chosen and made sure it is callable, it should be called to
+          extract information and the information should be processed. 
+        """
         def callback(response):
             # memorize first request
             if not self.first_response:
