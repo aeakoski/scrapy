@@ -32,6 +32,15 @@ class SitemapSpider(Spider):
             yield Request(url, self._parse_sitemap)
 
     def _parse_sitemap(self, response):
+        """
+        Requirements:
+        The branches are from checking the type of the sitemap and parsing accord-ingly. 
+            - if the response url ends with robots.txt handle it as a sitemap from robots
+            - if the response url is not a robots.txt handle it as a ordinary sitemap
+                - if there is no body, return None and log a warning because this is an error
+                - if the sitemap is of type sitemapindex handle the links accordingly using regex
+                - if the sitemap is of type urlset handle the link accordingly using regex
+        """
         if response.url.endswith('/robots.txt'):
             for url in sitemap_urls_from_robots(response.text, base_url=response.url):
                 yield Request(url, callback=self._parse_sitemap)
