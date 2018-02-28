@@ -11,7 +11,8 @@ from scrapy.utils.python import to_unicode
 from tests.spiders import FollowAllSpider, DelaySpider, SimpleSpider, \
     BrokenStartRequestsSpider, SingleRequestSpider, DuplicateStartRequestsSpider
 from tests.mockserver import MockServer
-
+from scrapy.commands import ScrapyCommand
+from scrapy.commands.crawl import Command
 
 class CrawlTestCase(TestCase):
 
@@ -277,3 +278,9 @@ with multiples lines
 
         self._assert_retried(log)
         self.assertIn("Got response 200", str(log))
+
+    def test_command_syntax(self):
+        self.assertEqual(Command().syntax(), "[options] <spider>")
+
+    def test_command_short_desc(self):
+        self.assertEqual(Command().short_desc(), "Run a spider")
