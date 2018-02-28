@@ -111,45 +111,31 @@ class ExecutionEngine(object):
         self.paused = False
 
     def _next_request(self, spider):
-        log = open("/Users/oskarek/Desktop/testing.cov", "a")
         slot = self.slot
         if not slot:
-            log.write("1\n")
             return
 
         if self.paused:
-            log.write("2\n")
             return
 
         while not self._needs_backout(spider):
-            log.write("3\n")
             if not self._next_request_from_scheduler(spider):
-                log.write("4\n")
                 break
-            else:
-                log.write("5\n")
 
         if slot.start_requests and not self._needs_backout(spider):
-            log.write("6\n")
             try:
                 request = next(slot.start_requests)
             except StopIteration:
-                log.write("7\n")
                 slot.start_requests = None
             except Exception:
-                log.write("8\n")
                 slot.start_requests = None
                 logger.error('Error while obtaining start requests',
                              exc_info=True, extra={'spider': spider})
             else:
-                log.write("9\n")
                 self.crawl(request, spider)
 
         if self.spider_is_idle(spider) and slot.close_if_idle:
-            log.write("10\n")
             self._spider_idle(spider)
-        log.write("\n")
-        log.write("\n")
 
     def _needs_backout(self, spider):
         slot = self.slot
