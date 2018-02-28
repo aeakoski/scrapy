@@ -4,7 +4,7 @@ import unittest
 from io import BytesIO
 from email.charset import Charset
 
-from scrapy.mail import MailSender
+from scrapy.mail import MailSender, _to_bytes_or_none
 
 class MailSenderTest(unittest.TestCase):
 
@@ -119,6 +119,10 @@ class MailSenderTest(unittest.TestCase):
         self.assertEqual(text.get_payload(decode=True).decode('utf-8'), body)
         self.assertEqual(text.get_charset(), Charset('utf-8'))
         self.assertEqual(attach.get_payload(decode=True).decode('utf-8'), body)
+
+    def test_to_bytes_or_none(self):
+        "condition: _to_bytes_or_none should not return None for a non-empty string"
+        self.assertNotEqual(_to_bytes_or_none("not_None"), None)
 
 if __name__ == "__main__":
     unittest.main()
