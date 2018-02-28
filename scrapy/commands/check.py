@@ -56,6 +56,15 @@ class Command(ScrapyCommand):
         parser.add_option("-v", "--verbose", dest="verbose", default=False, action='store_true',
                           help="print contract tests for all spiders")
 
+    """
+    Requirements
+    - Contracts, contractsmanager, runner and result are extracted based on previous settings
+    - The loader of the spider's attributes should be selected based on the contracts, contractsmanager
+      and runner objects.
+    - If opts is set, the function should not start the crawler and instead print the spider and its methods
+    - If opts is not set, the function should start the crawler and report relevant summaries and errors
+      to the result object, and then return the correct return code based on the success of the crawler
+    """
     def run(self, args, opts):
         # load contracts
         contracts = build_component_list(self.settings.getwithbase('SPIDER_CONTRACTS'))
