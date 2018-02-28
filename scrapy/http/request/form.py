@@ -69,7 +69,21 @@ def _urlencode(seq, enc):
 
 
 def _get_form(response, formname, formid, formnumber, formxpath):
-    """Find the form element """
+    """
+    Requirements:
+    - If no Form tag exists in the given response body, the program should error out.
+    - If there exists a formname that matches the input formname then that form shall be returned.
+    - If the formname does not exist the program shall continue.
+    - If the formID does not exist the program shall continue.
+    - If there exists a formID that matches the input formname then that form shall be returned.
+    - User-defined XML can be applyed to find a form and returned to the user.
+    - PARTLY UNTESTED - If user XML is faulty and no forms are found, throw an error.
+    - If the formnumber is not specified and no forms found, return None.
+    - The user can specify which form in the list of found forms to be returned.
+    - If the form number does not corespod to an indes of found forms, throw error.
+    """
+
+    # Find the form element
     root = create_root_node(response.text, lxml.html.HTMLParser,
                             base_url=get_base_url(response))
     forms = root.xpath('//form')
@@ -113,6 +127,14 @@ def _get_form(response, formname, formid, formnumber, formxpath):
 
 
 def _get_inputs(form, formdata, dont_click, clickdata, response):
+    """
+    Requirements:
+    - If input is not retrieveble from the input, raise a ValueError
+    - Returns all input field-names and its values as pair-tuples
+    - Ability to append names of clickable items and its values as tuples to
+      the return list if specified by the user
+    """
+
     try:
         formdata = dict(formdata or ())
     except (ValueError, TypeError):
@@ -164,9 +186,12 @@ def _select_value(ele, n, v):
 
 def _get_clickable(clickdata, form):
     """
-    Returns the clickable element specified in clickdata,
-    if the latter is given. If not, it returns the first
-    clickable element found
+    Requirements
+     - Returns the clickable elements name and value as a tuple specified in clickdata if given
+     - If no clickdata is specified, it returns the first clickable element found
+     - If no clickables exists in the form the function should return None
+     - If there exists multiple clickable elements and no clickdata is specified throw an error
+     - If no clickable events matched the given clickdata throw an error and notify the user
     """
     clickables = [
         el for el in form.xpath(
