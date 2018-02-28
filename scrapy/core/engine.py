@@ -110,17 +110,24 @@ class ExecutionEngine(object):
         """Resume the execution engine"""
         self.paused = False
 
-    def _next_request(self, spider):
-        slot = self.slot
-        if not slot:
-            return
+    def _next_request_preconditions(self, slot, paused):
+        return slot and not paused
 
-        if self.paused:
-            return
+    def _next_request_endconditions(self, spider, slot):
+        return self.spider_is_idle(spider) and slot.close_if_idle
 
+    def _wait_for_spider_conditions(self, spider):
+        "Stop execution until at least one of the conditions are true for the spider"
         while not self._needs_backout(spider):
             if not self._next_request_from_scheduler(spider):
                 break
+
+    def _next_request(self, spider):
+        slot = self.slot
+        if not self._next_request_preconditions(slot, self.paused):
+            return
+
+        self._wait_for_spider_conditions(spider)
 
         if slot.start_requests and not self._needs_backout(spider):
             try:
@@ -134,7 +141,7 @@ class ExecutionEngine(object):
             else:
                 self.crawl(request, spider)
 
-        if self.spider_is_idle(spider) and slot.close_if_idle:
+        if self._next_request_endconditions(spider, slot):
             self._spider_idle(spider)
 
     def _needs_backout(self, spider):
