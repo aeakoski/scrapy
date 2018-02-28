@@ -71,6 +71,18 @@ class FilteringLinkExtractor(object):
         self.deny_extensions = {'.' + e for e in arg_to_iter(deny_extensions)}
 
     def _link_allowed(self, link):
+        """
+         Requirements:
+         The branches in the function are due to all the validity checks by going through all the settings,
+         like if scrapy is blacklisting certain resources.
+         - if the urls is not a valid one, return false
+         - if allow_res is true and the link does not match allow_res return false
+         - if deny_res is true and the ulr matches a deny_res regex, it should return false
+         - if there are allowed domains (i,e whitelisting) and the url is not from the allowed domains return false
+         - if there are blacklisted domains and the url is from one of them, retunr false
+         - if the url has a denyed extansion return false
+         - o.w return true, the url is valid.
+        """
         if not _is_valid_url(link.url):
             return False
         if self.allow_res and not _matches(link.url, self.allow_res):
