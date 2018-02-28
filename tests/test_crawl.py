@@ -280,7 +280,9 @@ with multiples lines
         self.assertIn("Got response 200", str(log))
 
     def test_command_syntax(self):
+        "condition: Command should return the correct syntax"
         self.assertEqual(Command().syntax(), "[options] <spider>")
 
     def test_command_short_desc(self):
+        "condition: Command should return the correct short description"
         self.assertEqual(Command().short_desc(), "Run a spider")

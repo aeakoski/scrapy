@@ -121,6 +121,7 @@ class MailSenderTest(unittest.TestCase):
         self.assertEqual(attach.get_payload(decode=True).decode('utf-8'), body)
 
     def test_to_bytes_or_none(self):
+        "condition: _to_bytes_or_none should not return None for a non-empty string"
         self.assertNotEqual(_to_bytes_or_none("not_None"), None)
 
 if __name__ == "__main__":
