@@ -111,6 +111,21 @@ class ExecutionEngine(object):
         self.paused = False
 
     def _next_request(self, spider):
+
+        """
+        Requirements:
+        - if function is run outside timeslot, no request should be sent
+        - if execution engine is paused, no request should be sent
+        - if engine is executing from scheduler, call _next_request_from_scheduler
+            until flushed
+        - if the timeslot has a list of requests do as follows:
+            - select next request
+            - if no element was found, clear requests from timeslot
+            - if an exception occured at the iteration, log error
+            - else treat request
+        - if the spider is idle and the slot mentions to close the spider, close spider
+        """
+        
         slot = self.slot
         if not slot:
             return
